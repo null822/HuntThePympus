@@ -1,6 +1,4 @@
-﻿from platform import android_ver
-
-
+﻿
 class RoomId:
     def __init__(self, ring_index: int, room_index: int):
         self.ring_index: int = ring_index
@@ -11,7 +9,7 @@ class RoomId:
         return RoomId(int(packed / 5), packed % 5)
     
     @staticmethod
-    def try_parse(string: str):
+    def try_parse(string: str) -> 'RoomId' or None: 
         if len(string) < 2:
             return None
         

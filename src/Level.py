@@ -15,12 +15,12 @@ class Level:
         wumpus_room: RoomId = RoomId.from_packed(random.randint(0, 19))
         room_selector = ExclusiveRngSelector()
         bat_rooms = [
-            RoomId.from_packed(room_selector.next(20)),
-            RoomId.from_packed(room_selector.next(20)),
+            RoomId.from_packed(room_selector.next(19)),
+            RoomId.from_packed(room_selector.next(19)),
         ]
         pit_rooms = [
-            RoomId.from_packed(room_selector.next(20)),
-            RoomId.from_packed(room_selector.next(20))
+            RoomId.from_packed(room_selector.next(19)),
+            RoomId.from_packed(room_selector.next(19))
         ]
         
         for ring_index in range(0, 4):
@@ -54,7 +54,7 @@ class Level:
 
 
     def get_nearby_messages(self, room):
-        messages = []
+        messages: list[str] = []
         for roomConnection in self.get(room).id.get_room_connections():
             connected_room = self.get(roomConnection)
             connected_room.add_messages(messages)
