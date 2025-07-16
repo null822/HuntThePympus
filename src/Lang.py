@@ -3,38 +3,41 @@
     break_major = "================================"
     break_minor = "--------------------------------"
 
-    current_room = "You are in Room {0}"
-    tunnel_connections = "Tunnels lead to Rooms {0}, {1}, {2}"
+    current_room = "You are in Room {pos}"
+    tunnel_connections = "Tunnels lead to Rooms {r0}, {r1}, {r2}"
 
     action = "Shoot or Move (S/M) ? "
     action_move = "Where To? "
     action_shoot = "Which Room? "
 
-    invalidMove = "Can't get there!"
-    invalidShoot = "Can't shoot there!"
+    invalid_room = "Invalid Room!"
+    invalid_action = "Invalid Action!"
+    invalid_move = "Can't get there!"
+    invalid_shoot = "Can't shoot there!"
 
-    arrowsLeft = "{0} Arrows Left"
-    arrowMiss = "You Missed!"
-    arrowHit = "You hit the wumpus!"
+    arrows_left = "{count} Arrows Left"
+    arrow_miss = "You Missed!"
+    arrow_hit = "You hit the wumpus!"
 
-    wumpusNearby = "You smell a wumpus nearby"
-    batNearby = "You hear flapping nearby"
-    pitNearby = "You feel a breeze nearby"
+    wumpus_nearby = "You smell a wumpus nearby"
+    bat_nearby = "You hear flapping nearby"
+    pit_nearby = "You feel a breeze nearby"
 
     death = "HA HA HA - YOU LOSE!"
     win = "YOU GOT THE WUMPUS!\nHEE HEE HEE - HE'LL GETCHA NEXT TIME!!"
 
-    wumpusWake = "You woke the wumpus!"
-    wumpusMove = "The wumpus ran away!"
-    wumpusDeath = "...OOPS! THE WUMPUS GOT YOU!"
-    pitEnter = "YYYIIIIEEEE . . . FELL IN PIT"
-    batEnter = "ZAP--SUPER BAT SNATCH! ELSEWHEREVILLE FOR YOU!"
-    noArrows = "YOU'VE RUN OUT OF ARROWS!"
+    wumpus_wake = "You woke the wumpus!"
+    wumpus_move = "The wumpus ran away!"
+    wumpus_death = "...OOPS! THE WUMPUS GOT YOU!"
+    pit_enter = "YYYIIIIEEEE . . . FELL IN PIT"
+    bat_enter = "ZAP--SUPER BAT SNATCH! ELSEWHEREVILLE FOR YOU!"
+    no_arrows = "YOU'VE RUN OUT OF ARROWS!"
     
     @staticmethod
-    def print(s, color = "39;49;"):
+    def print(s, color = "39;49;", end='\n'):
         color = color[:len(color)-1]
-        print(f"\033[0m\033[{color}m{s}\033[0m")
+        print(f"\033[0m\033[{color}m{s}\033[0m", end=end)
+    
     
     @staticmethod
     def set_color(color):

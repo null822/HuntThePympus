@@ -10,9 +10,9 @@ from src.Rooms.PitRoom import PitRoom
 class Level:
     
     def __init__(self):
-        self.rooms = [[Room()]*4]*5 # 4 rings per level, 5 rooms per ring
+        self.rooms: list[Room] = [Room()]*20
         
-        wumpus_room = RoomId.from_packed(random.randint(0, 20))
+        wumpus_room: RoomId = RoomId.from_packed(random.randint(0, 19))
         room_selector = ExclusiveRngSelector()
         bat_rooms = [
             RoomId.from_packed(room_selector.next(20)),
@@ -23,37 +23,39 @@ class Level:
             RoomId.from_packed(room_selector.next(20))
         ]
         
-        for ringIndex in range(0, 4):
-            for roomIndex in range(0, 4):
+        for ring_index in range(0, 4):
+            for room_index in range(0, 5):
+                id = RoomId(ring_index, room_index)
                 
-                id = RoomId(ringIndex, roomIndex)
-                
-                if any(r = id for (_, _, r) in bat_rooms):
+                if id in bat_rooms:
                     room = BatRoom()
-                elif any(r = id for (_, _, r) in pit_rooms):
+                elif id in pit_rooms:
                     room = PitRoom()
                 else:
                     room = EmptyRoom()
                 
-                room.HasWumpus = id == wumpus_room
+                room.has_wumpus = id == wumpus_room
                 
                 room.id = id
-                self.rooms[ringIndex][roomIndex] = room
-
-    def get(self, id):
-        return self.rooms[id.RingIndex][id.RoomIndex]
-    def set(self, id, value):
-        self.set_room(value, id)
+                
+                self.set(RoomId(ring_index, room_index), room)
+        print(self.rooms)
+                
+    def __getitem__(self, id: RoomId):
+        return self.get(id)
+    def __setitem__(self, id: RoomId, room: Room):
+        self.set(id, room)
     
-    def set_room(self, room, id):
+    def get(self, id: RoomId) -> Room:
+        return self.rooms[RoomId(id.ring_index, id.room_index).as_packed()]
+    def set(self, id: RoomId, room: Room):
         room.id = id
-        self.rooms[id.RingIndex][id.RoomIndex] = room
+        self.rooms[RoomId(id.ring_index, id.room_index).as_packed()] = room
 
 
     def get_nearby_messages(self, room):
-        
         messages = []
-        for roomConnection in self.get(room).get_room_connections():
+        for roomConnection in self.get(room).id.get_room_connections():
             connected_room = self.get(roomConnection)
             connected_room.add_messages(messages)
         return messages

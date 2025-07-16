@@ -5,8 +5,8 @@ from src.Room import Room
 class BatRoom(Room):
     def __init__(self):
         super().__init__()
-        self.type = "Bat"
+        self.type: str = "Bat"
     
-    def add_messages(self, messages):
+    def add_messages(self, messages: list[str]) -> None:
         super().add_messages(messages)
-        messages.Add(Lang.batNearby)
+        messages.append(Lang.bat_nearby)
