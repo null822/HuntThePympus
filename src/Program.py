@@ -123,29 +123,31 @@ class Program:
             if rooms is None:
                 return ActionResult.fail
         
-        connected_rooms = Program.connected_rooms
+        prev_connections = Program.player_pos.get_room_connections()
         for shootRoomStr in rooms:
-            shoot_room = RoomId.try_parse(shootRoomStr)
-            if shoot_room is None:
-                continue
+            shoot_room_id = RoomId.try_parse(shootRoomStr)
+            if shoot_room_id is None:
+                Lang.print(Lang.invalid_room, TextStyle.fDarkYellow)
+                return ActionResult.fail
+            shoot_room = Program.level[shoot_room_id]
 
-            if not shoot_room in connected_rooms:
+            if not shoot_room_id in prev_connections:
                 Lang.print(Lang.invalid_shoot, TextStyle.fDarkYellow)
                 return ActionResult.fail
 
-            if Program.level[shoot_room].has_wumpus:
-                new_wumpus_room = Program.wake_wumpus(shoot_room)
+            if shoot_room.has_wumpus:
+                new_wumpus_room = Program.wake_wumpus(shoot_room_id)
 
-                if new_wumpus_room == shoot_room:
+                if new_wumpus_room == shoot_room_id:
                     return ActionResult.win
 
                 Lang.print(Lang.arrow_hit, TextStyle.fGreen)
                 Lang.print(Lang.wumpus_move)
-                print(f"{shoot_room} -> {new_wumpus_room}")
+                print(f"{shoot_room_id} -> {new_wumpus_room}")
                 return ActionResult.success
-
+            
             Lang.print(Lang.arrow_miss, TextStyle.fYellow)
-            connected_rooms = Program.level[shoot_room].id.get_room_connections()
+            prev_connections = shoot_room_id.get_room_connections()
 
         Program.arrow_count = Program.arrow_count - 1
         if Program.arrow_count == 0:
