@@ -10,6 +10,9 @@ from src.Rooms.PitRoom import PitRoom
 
 
 class Program:
+    """
+    The main program
+    """
     level: Level = Level()
     player_pos: RoomId = RoomId.from_packed(random.randint(0, 19))
     connected_rooms: list[RoomId] = []
@@ -18,6 +21,9 @@ class Program:
 
     @staticmethod
     def main():
+        """
+        The program entrypoint
+        """
         while True:
             if Program.debug_mode:
                 action = Program.handle_debug()
@@ -54,6 +60,9 @@ class Program:
 
     @staticmethod
     def handle_action() -> int:
+        """
+        Gets an input from the user and handles it, returning the result
+        """
         action = input(Lang.action).lower().split(' ')
         if action is None:
             return ActionResult.fail
@@ -76,6 +85,9 @@ class Program:
 
     @staticmethod
     def handle_move(move_room: RoomId = None) -> int:
+        """
+        Handles a move action, returning the result
+        """
         if move_room is None:
             Lang.print(Lang.action_move, TextStyle.fGreen, '')
             move_room_str = input()
@@ -93,12 +105,15 @@ class Program:
 
     @staticmethod
     def handle_room_enter() -> int:
+        """
+        Handles entering a room, returning the result
+        """
         new_room = Program.level[Program.player_pos]
         woke_wumpus = False
         if new_room.has_wumpus:
             new_wumpus_room = Program.wake_wumpus(Program.player_pos)
             Lang.print(Lang.wumpus_wake, TextStyle.fRed)
-
+            
             if Program.player_pos == new_wumpus_room:
                 Lang.print(Lang.wumpus_death)
                 return ActionResult.death
@@ -117,6 +132,9 @@ class Program:
 
     @staticmethod
     def handle_shoot(rooms: list[str] = None) -> int:
+        """
+        Handles shooting, getting user input if necessary, and returning the result
+        """
         if rooms is None:
             Lang.print(Lang.action_shoot, TextStyle.fGreen, '')
             rooms = input().split(' ')
@@ -160,6 +178,9 @@ class Program:
 
     @staticmethod
     def wake_wumpus(wumpus_room_id) -> RoomId:
+        """
+        Handles waking the wumpus, returning where the wumpus moved to
+        """
         choice = random.randint(0, 3)
         if choice != 3:
             wumpus_room = Program.level[wumpus_room_id]
@@ -172,6 +193,9 @@ class Program:
 
     @staticmethod
     def handle_debug() -> int:
+        """
+        Handles the debug utilities, getting a command from the user, running it, and returning the result
+        """
         Lang.print("dbg > ", TextStyle.fMagenta, '')
         cmd = input().lower().split(' ')
 

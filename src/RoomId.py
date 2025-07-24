@@ -1,15 +1,25 @@
 ﻿
 class RoomId:
+    """
+    Represents the ID / location of a room
+    """
     def __init__(self, ring_index: int, room_index: int):
         self.ring_index: int = ring_index
         self.room_index: int = room_index
     
     @staticmethod
     def from_packed(packed: int):
+        """
+        Converts an int [0, 20] into a RoomId
+        """
         return RoomId(int(packed / 5), packed % 5)
     
     @staticmethod
-    def try_parse(string: str) -> 'RoomId' or None: 
+    def try_parse(string: str) -> 'RoomId' or None:
+        """
+        Parses a string containing a number into a RoomId
+        Example: "21" -> {ring_index = 2, room_index = 1}
+        """
         if len(string) < 2:
             return None
         
@@ -24,10 +34,13 @@ class RoomId:
         
         return RoomId(ring, room)
     
-    def as_packed(self):
+    def as_packed(self) -> int:
+        """
+        Converts this RoomId into a packed integer in [0, 20] range
+        """
         return self.ring_index * 5 + self.room_index
     
-    def get_room_connections(self):
+    def get_room_connections(self) -> list['RoomId']:
         if self.ring_index == 1 or self.ring_index == 2:
             new_ring_inter = 2 if self.ring_index == 1 else 1
             room_offset_inter1 = -1 if self.ring_index == 1 else 0

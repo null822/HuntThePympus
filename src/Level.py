@@ -8,9 +8,11 @@ from src.Rooms.EmptyRoom import EmptyRoom
 from src.Rooms.PitRoom import PitRoom
 
 class Level:
-    
+    """
+    Represents a level/world
+    """
     def __init__(self):
-        self.rooms: list[Room] = [Room()]*20
+        self.rooms: list[Room] = [Room()]*20 # array of rooms, indexed by packed RoomId
         
         wumpus_room: RoomId = RoomId.from_packed(random.randint(0, 19))
         room_selector = ExclusiveRngSelector()
@@ -47,13 +49,21 @@ class Level:
         self.set(id, room)
     
     def get(self, id: RoomId) -> Room:
+        """
+        Gets a room, from its RoomId
+        """
         return self.rooms[RoomId(id.ring_index, id.room_index).as_packed()]
     def set(self, id: RoomId, room: Room):
+        """
+        Replaces the room at the specified RoomId
+        """
         room.id = id
         self.rooms[RoomId(id.ring_index, id.room_index).as_packed()] = room
-
-
-    def get_nearby_messages(self, room):
+    
+    def get_nearby_messages(self, room: RoomId) -> list[str]:
+        """
+        Returns the messages from all rooms connected to the supplied room
+        """
         messages: list[str] = []
         for roomConnection in self.get(room).id.get_room_connections():
             connected_room = self.get(roomConnection)

@@ -1,37 +1,37 @@
 ﻿class Lang:
-
+    
     break_major = "================================"
     break_minor = "--------------------------------"
 
-    current_room = "You are in Room {pos}"
-    tunnel_connections = "Tunnels lead to Rooms {r0}, {r1}, {r2}"
+    current_room = "You are in position {pos}"
+    tunnel_connections = "Pathways lead to positions {r0}, {r1}, {r2}"
 
     action = "Shoot or Move (S/M) ? "
-    action_move = "Where To? "
-    action_shoot = "Which Room? "
+    action_move = "Where position? "
+    action_shoot = "Which position? "
 
-    invalid_room = "Invalid Room!"
+    invalid_room = "Invalid position!"
     invalid_action = "Invalid Action!"
     invalid_move = "Can't get there!"
     invalid_shoot = "Can't shoot there!"
 
-    arrows_left = "{count} Arrows Left"
+    arrows_left = "{count} Bullets Left"
     arrow_miss = "You Missed!"
-    arrow_hit = "You hit the wumpus!"
+    arrow_hit = "You hit the Viet Cong soldier!"
 
-    wumpus_nearby = "You smell a wumpus nearby"
-    bat_nearby = "You hear flapping nearby"
-    pit_nearby = "You feel a breeze nearby"
+    wumpus_nearby = "You hear leaves rustling nearby"
+    bat_nearby = "You see one of your tunnels nearby"
+    pit_nearby = "Your friends warn you of a trap nearby"
 
-    death = "HA HA HA - YOU LOSE!"
-    win = "YOU GOT THE WUMPUS!\nHEE HEE HEE - HE'LL GETCHA NEXT TIME!!"
+    death = "(something)"
+    win = "YOU GOT THE VIET CONG SOLDIER!!"
 
-    wumpus_wake = "You woke the wumpus!"
-    wumpus_move = "The wumpus ran away!"
-    wumpus_death = "...OOPS! THE WUMPUS GOT YOU!"
-    pit_enter = "YYYIIIIEEEE . . . FELL IN PIT"
-    bat_enter = "ZAP--SUPER BAT SNATCH! ELSEWHEREVILLE FOR YOU!"
-    no_arrows = "YOU'VE RUN OUT OF ARROWS!"
+    wumpus_wake = "You got the attention of the Viet Cong solder!"
+    wumpus_move = "The Viet Cong soldier ran away"
+    wumpus_death = "THE VIET CONG SOLDIER YOU GOT YOU!!"
+    pit_enter = "You fell in a trap!"
+    bat_enter = "A fellow soldier signals you to climb down into the tunnel"
+    no_arrows = "YOU'VE RUN OUT OF BULLETS!"
     
     @staticmethod
     def print(s, color = "39;49;", end='\n'):
