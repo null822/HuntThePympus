@@ -25,7 +25,6 @@ class Program:
         """
         The program entrypoint
         """
-        Tests.run(Program)
         os.system('cls' if os.name=='nt' else 'clear')
         while True:
 
