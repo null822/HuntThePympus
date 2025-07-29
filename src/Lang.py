@@ -7,7 +7,7 @@
     tunnel_connections = "Pathways lead to positions {r0}, {r1}, {r2}"
 
     action = "Shoot or Move (S/M) ? "
-    action_move = "Where position? "
+    action_move = "Which position? "
     action_shoot = "Which position? "
 
     invalid_room = "Invalid position!"
@@ -16,25 +16,28 @@
     invalid_shoot = "Can't shoot there!"
 
     arrows_left = "{count} Bullets Left"
-    arrow_miss = "You Missed!"
+    arrow_miss = "No enemy in position {r}"
     arrow_hit = "You hit the Viet Cong soldier!"
 
     wumpus_nearby = "You hear leaves rustling nearby"
     bat_nearby = "You see one of your tunnels nearby"
     pit_nearby = "Your friends warn you of a trap nearby"
 
-    death = "(something)"
-    win = "YOU GOT THE VIET CONG SOLDIER!!"
+    death = "LOOKS LIKE THE VIET CONG WIN AGAIN"
+    win = "YOU KILLED THE VIET CONG SOLDIER!!"
 
-    wumpus_wake = "You got the attention of the Viet Cong solder!"
+    wumpus_wake = "The Viet Cong solder found you!"
     wumpus_move = "The Viet Cong soldier ran away"
-    wumpus_death = "THE VIET CONG SOLDIER YOU GOT YOU!!"
+    wumpus_death = "THE VIET CONG SOLDIER SHOT YOU!!"
     pit_enter = "You fell in a trap!"
     bat_enter = "A fellow soldier signals you to climb down into the tunnel"
     no_arrows = "YOU'VE RUN OUT OF BULLETS!"
     
+    enable_print = True
+    
     @staticmethod
-    def print(s, color = "39;49;", end='\n'):
+    def print(s, color = "39;49;", end='\n', force = False):
+        if not (Lang.enable_print or force): return
         color = color[:len(color)-1]
         print(f"\033[0m\033[{color}m{s}\033[0m", end=end)
     

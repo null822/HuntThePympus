@@ -41,7 +41,6 @@ class Level:
                 room.id = id
                 
                 self.set(RoomId(ring_index, room_index), room)
-        print(self.rooms)
                 
     def __getitem__(self, id: RoomId):
         return self.get(id)

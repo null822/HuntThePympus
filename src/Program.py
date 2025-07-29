@@ -1,4 +1,5 @@
-﻿import random
+﻿import os
+import random
 
 from src.ActionResult import ActionResult
 from src.Lang import Lang, TextStyle
@@ -7,6 +8,7 @@ from src.RoomId import RoomId
 from src.Rooms.BatRoom import BatRoom
 from src.Rooms.EmptyRoom import EmptyRoom
 from src.Rooms.PitRoom import PitRoom
+from src.Tests import Tests
 
 
 class Program:
@@ -15,7 +17,6 @@ class Program:
     """
     level: Level = Level()
     player_pos: RoomId = RoomId.from_packed(random.randint(0, 19))
-    connected_rooms: list[RoomId] = []
     arrow_count: int = 5
     debug_mode: bool = False
 
@@ -24,13 +25,16 @@ class Program:
         """
         The program entrypoint
         """
+        Tests.run(Program)
+        os.system('cls' if os.name=='nt' else 'clear')
         while True:
+
             if Program.debug_mode:
-                action = Program.handle_debug()
+                action: int = Program.handle_debug()
             else:
                 Lang.print(Lang.break_major)
 
-                action = Program.handle_room_enter()
+                action: int = Program.handle_room_enter()
                 if action == ActionResult.restartRound:
                     continue
 
@@ -38,18 +42,18 @@ class Program:
                     Lang.print(Lang.break_minor)
 
                 if action != ActionResult.win and action != ActionResult.death:
-                    Program.connected_rooms = Program.player_pos.get_room_connections()
-
+                    
+                    connected_rooms = Program.player_pos.get_room_connections()
                     Lang.print(Lang.current_room.format(pos=Program.player_pos), TextStyle.fCyan)
                     Lang.print(Lang.tunnel_connections.format(
-                        r0=Program.connected_rooms[0],
-                        r1=Program.connected_rooms[1],
-                        r2=Program.connected_rooms[2]))
+                        r0=connected_rooms[0],
+                        r1=connected_rooms[1],
+                        r2=connected_rooms[2]))
                     messages = Program.level.get_nearby_messages(Program.player_pos)
                     for message in messages:
                         Lang.print(message, TextStyle.fYellow)
                     
-                    action = Program.handle_action()
+                    action: int = Program.handle_action()
 
             if action == ActionResult.death:
                 Lang.print(Lang.death, TextStyle.fRed)
@@ -74,14 +78,18 @@ class Program:
         
         match action[0]:
             case "s":
-                result = Program.handle_shoot(action[1:] if len(action) > 0 else None),
+                result: tuple[int] = Program.handle_shoot(RoomId.try_parse(action[1]) if len(action) > 1 else None),
             case "m":
-                result = Program.handle_move(RoomId.try_parse(action[1]) if len(action) > 0 else None),
+                result: tuple[int] = Program.handle_move(RoomId.try_parse(action[1]) if len(action) > 1 else None),
             case _:
-                Lang.print(Lang.invalid_action, TextStyle.fDarkYellow)
-                result = ActionResult.fail
-        
-        return result
+                move_room = RoomId.try_parse(action[0])
+                if move_room is not None:
+                    result: tuple[int] = Program.handle_move(move_room),
+                else:
+                    Lang.print(Lang.invalid_action, TextStyle.fRed)
+                    result = (ActionResult.fail,)
+                
+        return result[0]
 
     @staticmethod
     def handle_move(move_room: RoomId = None) -> int:
@@ -93,11 +101,11 @@ class Program:
             move_room_str = input()
             move_room = RoomId.try_parse(move_room_str)
             if move_room is None:
-                Lang.print(Lang.invalid_room, TextStyle.fDarkYellow)
+                Lang.print(Lang.invalid_room, TextStyle.fRed)
                 return ActionResult.fail
 
-        if not move_room in Program.connected_rooms:
-            Lang.print(Lang.invalid_move, TextStyle.fDarkYellow)
+        if not move_room in Program.player_pos.get_room_connections():
+            Lang.print(Lang.invalid_move, TextStyle.fRed)
             return ActionResult.fail
 
         Program.player_pos = move_room
@@ -115,14 +123,18 @@ class Program:
             Lang.print(Lang.wumpus_wake, TextStyle.fRed)
             
             if Program.player_pos == new_wumpus_room:
-                Lang.print(Lang.wumpus_death)
+                Lang.print(Lang.wumpus_death, TextStyle.fRed)
                 return ActionResult.death
             Lang.print(Lang.wumpus_move, TextStyle.fYellow)
             woke_wumpus = True
 
         if type(new_room) is BatRoom:
-            Lang.print(Lang.bat_enter, TextStyle.fRed)
-            Program.player_pos = RoomId.from_packed(random.randint(0, 20))
+            Lang.print(Lang.bat_enter, TextStyle.fGreen)
+            packed_room = random.randint(0, 18) # any room except the current one
+            if packed_room >= Program.player_pos.as_packed():
+                packed_room += 1
+            Program.player_pos = RoomId.from_packed(packed_room)
+        
             return ActionResult.restartRound
         elif type(new_room) is PitRoom:
             Lang.print(Lang.pit_enter, TextStyle.fRed)
@@ -131,49 +143,50 @@ class Program:
             return ActionResult.success if woke_wumpus else ActionResult.fail
 
     @staticmethod
-    def handle_shoot(rooms: list[str] = None) -> int:
+    def handle_shoot(shoot_room_id: RoomId = None) -> int:
         """
         Handles shooting, getting user input if necessary, and returning the result
         """
-        if rooms is None:
+        if shoot_room_id is None:
             Lang.print(Lang.action_shoot, TextStyle.fGreen, '')
-            rooms = input().split(' ')
-            if rooms is None:
+            shoot_room_id = input()
+            if shoot_room_id is None:
                 return ActionResult.fail
         
-        prev_connections = Program.player_pos.get_room_connections()
-        for shootRoomStr in rooms:
-            shoot_room_id = RoomId.try_parse(shootRoomStr)
-            if shoot_room_id is None:
-                Lang.print(Lang.invalid_room, TextStyle.fDarkYellow)
-                return ActionResult.fail
-            shoot_room = Program.level[shoot_room_id]
-
-            if not shoot_room_id in prev_connections:
-                Lang.print(Lang.invalid_shoot, TextStyle.fDarkYellow)
-                return ActionResult.fail
-
-            if shoot_room.has_wumpus:
-                new_wumpus_room = Program.wake_wumpus(shoot_room_id)
-
-                if new_wumpus_room == shoot_room_id:
-                    return ActionResult.win
-
-                Lang.print(Lang.arrow_hit, TextStyle.fGreen)
-                Lang.print(Lang.wumpus_move)
-                print(f"{shoot_room_id} -> {new_wumpus_room}")
-                return ActionResult.success
-            
-            Lang.print(Lang.arrow_miss, TextStyle.fYellow)
-            prev_connections = shoot_room_id.get_room_connections()
-
+        # arrow count
         Program.arrow_count = Program.arrow_count - 1
+        Lang.print(Lang.arrows_left.format(count=Program.arrow_count), TextStyle.fRed)
+        
+        if shoot_room_id is None:
+            Lang.print(Lang.invalid_room, TextStyle.fRed)
+            return ActionResult.fail
+        shoot_room = Program.level[shoot_room_id]
+        
+        # can't reach room
+        if not shoot_room_id in Program.player_pos.get_room_connections():
+            Lang.print(Lang.invalid_shoot, TextStyle.fRed)
+            return ActionResult.fail
+        
+        # hit wumpus
+        if shoot_room.has_wumpus:
+            new_wumpus_room = Program.wake_wumpus(shoot_room_id)
+
+            Lang.print(Lang.arrow_hit, TextStyle.fGreen)
+            if new_wumpus_room == shoot_room_id:
+                return ActionResult.win
+            
+            Lang.print(Lang.wumpus_move, TextStyle.fYellow)
+            
+            if Program.arrow_count == 0:
+                Lang.print(Lang.no_arrows, TextStyle.fRed)
+                return ActionResult.death
+            return ActionResult.success
+        
+        Lang.print(Lang.arrow_miss.format(r=shoot_room_id), TextStyle.fYellow)
+
         if Program.arrow_count == 0:
-            Lang.print(Lang.no_arrows)
+            Lang.print(Lang.no_arrows, TextStyle.fRed)
             return ActionResult.death
-
-        Lang.print(Lang.arrows_left.format(count=Program.arrow_count), TextStyle.fYellow)
-
         return ActionResult.success
 
     @staticmethod
@@ -181,11 +194,11 @@ class Program:
         """
         Handles waking the wumpus, returning where the wumpus moved to
         """
-        choice = random.randint(0, 3)
-        if choice != 3:
+        win = random.randint(1, 100)
+        if win <= 25:
             wumpus_room = Program.level[wumpus_room_id]
             wumpus_room.has_wumpus = False
-            wumpus_room_id = wumpus_room.id.get_room_connections()[choice]
+            wumpus_room_id = wumpus_room.id.get_room_connections()[random.randint(0, 2)]
             wumpus_room = Program.level[wumpus_room_id]
             wumpus_room.has_wumpus = True
 
@@ -211,7 +224,8 @@ class Program:
     set {room (int)} {room type (string)} {with wumpus (bool)} - Display help information
     exit - Exit debug mode
     death - Die instantly
-    win - Win instantly""", TextStyle.fDarkMagenta)
+    win - Win instantly
+    test - Run the unit tests and exit""", TextStyle.fDarkMagenta)
             case "ls":
                 for i in range(20):
                     id = RoomId.from_packed(i)
@@ -245,12 +259,11 @@ class Program:
                 return ActionResult.death
             case "win":
                 return ActionResult.win
+            case "test":
+                Tests.run(Program)
+                return ActionResult.win
             case _:
                 Lang.print(f"Command {cmd[0]} not found!", TextStyle.fRed)
                 return ActionResult.fail
 
         return ActionResult.success
-
-
-if __name__ == "__main__":
-    Program.main()
