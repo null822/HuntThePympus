@@ -1,5 +1,6 @@
 ﻿from src.ActionResult import ActionResult
-from src.Lang import Lang, TextStyle
+from src.Lang import Lang
+from src.TextStyle import TextStyle
 from src.RoomId import RoomId
 from src.Rooms.BatRoom import BatRoom
 from src.Rooms.EmptyRoom import EmptyRoom
