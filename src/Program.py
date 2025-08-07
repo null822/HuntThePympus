@@ -202,8 +202,7 @@ class Program:
         # hit wumpus
         if shoot_room.has_wumpus:
             new_wumpus_room = Program.wake_wumpus(shoot_room_id)
-
-            Lang.print(Lang.arrow_hit, TextStyle.fGreen)
+            
             if new_wumpus_room == shoot_room_id:
                 return ActionResult.win
             

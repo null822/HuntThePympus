@@ -38,7 +38,6 @@ class Lang:
 
     arrows_left = "{count} Bullets Left"
     arrow_miss = "No enemy in position {r}"
-    arrow_hit = "You hit the Viet Cong soldier!"
 
     wumpus_nearby = "You hear leaves rustling nearby"
     bat_nearby = "You see one of your tunnels nearby"
